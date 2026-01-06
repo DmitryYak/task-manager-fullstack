@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <title>Task Manager</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      input[type="text"] {
+        width: 70%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      button {
+        padding: 12px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .completed {
+        text-decoration: line-through;
+        opacity: 0.6;
+        background: #e9ecef;
+      }
+      .actions .toggle-btn {
+        background: #28a745;
+        margin-left: 5px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+
+      .actions .toggle-btn:hover {
+        background: #218838;
+      }
+
+      .actions button:not(.toggle-btn) {
+        background: #dc3545;
+      }
+
+      .actions button:not(.toggle-btn):hover {
+        background: #c82333;
+      }
+
+      .actions button:hover {
+        background: #c82333;
+      }
+      .toggle-btn {
+        background: #28a745;
+      }
+      .toggle-btn:hover {
+        background: #218838;
+      }
+      .loading {
+        text-align: center;
+        color: #666;
+      }
+      .error {
+        color: #dc3545;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Task Manager</h1>
+    <div>
+      <input type="text" id="taskInput" placeholder="Введите задачу..." />
+      <button id="addBtn">Добавить</button>
+    </div>
+    <ul id="taskList"></ul>
+    <div id="status"></div>
+
+    <!-- Axios из node_modules (после npm i axios) -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
+[web:31]
