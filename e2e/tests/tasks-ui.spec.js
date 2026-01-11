@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const BASE_URL = "http://localhost:5500"; // где лежит index.html
+const BASE_URL = process.env.BASE_URL || "http://localhost:5500";
 
 test.describe("Task Manager UI", () => {
   test.beforeEach(async ({ page }) => {

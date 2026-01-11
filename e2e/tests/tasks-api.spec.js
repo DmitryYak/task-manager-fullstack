@@ -1,7 +1,7 @@
 require("dotenv").config();
 import { test, expect } from "@playwright/test";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.API_URL || "http://localhost:3000";
 
 test.describe("Tasks API", () => {
   let taskId;
