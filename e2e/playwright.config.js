@@ -1,20 +1,7 @@
-// const { defineConfig } = require("@playwright/test");
+const { defineConfig } = require("@playwright/test");
+require("dotenv").config();
 
-// module.exports = defineConfig({
-//   testDir: "./tests",
-//   testMatch: ["**/*.spec.js"],
-//   use: {
-//     baseURL: "http://localhost:5500",
-//     headless: false,
-//   },
-// });
-
-import { defineConfig } from "@playwright/test";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-export default defineConfig({
+module.exports = defineConfig({
   testDir: "./tests",
   testMatch: ["**/*.spec.js"],
   use: {
@@ -22,3 +9,17 @@ export default defineConfig({
     headless: false,
   },
 });
+
+// import { defineConfig } from "@playwright/test";
+// import dotenv from "dotenv";
+
+// dotenv.config();
+
+// export default defineConfig({
+//   testDir: "./tests",
+//   testMatch: ["**/*.spec.js"],
+//   use: {
+//     baseURL: "http://localhost:5500",
+//     headless: false,
+//   },
+// });

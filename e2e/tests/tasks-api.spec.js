@@ -1,7 +1,10 @@
-import dotenv from "dotenv";
-import { test, expect } from "@playwright/test";
+require("dotenv").config();
+const { test, expect } = require("@playwright/test");
 
-dotenv.config();
+// import dotenv from "dotenv";
+// import { test, expect } from "@playwright/test";
+
+// dotenv.config();
 
 const API_URL = process.env.API_URL || "http://localhost:3000";
 
@@ -61,10 +64,10 @@ test.describe("Tasks API", () => {
     expect(body.message).toBe("Удалено");
   });
 
-  // test.describe.only(`check get tasks`, () => {
-  //   test(`check get tasks`, async ({ request }) => {
-  //     const response = await request.get(`${API_URL}/tasks`);
-  //     expect(response.status().toBe(200));
-  //   });
-  // });
+  test.describe.only(`check get tasks`, () => {
+    test(`check get tasks`, async ({ request }) => {
+      const response = await request.get(`${API_URL}/tasks`);
+      expect(response.status()).toBe(200);
+    });
+  });
 });
