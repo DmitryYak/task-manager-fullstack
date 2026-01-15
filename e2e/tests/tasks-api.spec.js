@@ -64,10 +64,10 @@ test.describe("Tasks API", () => {
     expect(body.message).toBe("Удалено");
   });
 
-  test.describe.only(`check get tasks`, () => {
-    test(`check get tasks`, async ({ request }) => {
-      const response = await request.get(`${API_URL}/tasks`);
-      expect(response.status()).toBe(200);
-    });
-  });
+  // test.describe.only(`check get tasks`, () => {
+  //   test(`check get tasks`, async ({ request }) => {
+  //     const response = await request.get(`${API_URL}/tasks`);
+  //     expect(response.status()).toBe(200);
+  //   });
+  // });
 });

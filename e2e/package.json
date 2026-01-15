@@ -7,7 +7,8 @@
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test tests/tasks-ui.spec.js",
-    "test:api": "playwright test tests/tasks-api.spec.js"
+    "test:api": "playwright test tests/tasks-api.spec.js",
+    "test:test": "playwright test tests/tasks-tests.spec.js"
   },
   "keywords": [],
   "author": "",
