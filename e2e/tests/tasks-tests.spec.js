@@ -60,7 +60,7 @@ test.describe(`check tasks get`, () => {
     const ids = body.map((item) => item.id);
     const uniqueness = new Set(ids);
     console.log(
-      `uniqueness size: ${uniqueness.size}, ids.lenght: ${uniqueness.size}`
+      `uniqueness size: ${uniqueness.size}, ids.lenght: ${uniqueness.size}`,
     );
     expect(uniqueness.size).toBe(ids.length);
   });
@@ -80,11 +80,45 @@ test.describe(`check post endpoint /tasks + delete`, () => {
     expect(response.status()).toBe(200);
     const body = await response.json();
     expect(duration).toBeLessThan(1000);
+    const taskId = body.id;
+    console.log(taskId);
     expect(body).toHaveProperty("id");
     expect(body).toHaveProperty("title");
     expect(body).toHaveProperty("completed");
     expect(body.completed).toBe(false);
     expect(body.title).toBe(`task check post Playwright #${randomNum}`);
     expect(typeof body.id).toBe("number");
+    const deleteTask = await request.delete(`${URL_TASKS}/${taskId}`);
+    expect(deleteTask.status()).toBe(200);
+    const deleteBody = await deleteTask.json();
+    expect(deleteBody.message).toBe("Удалено");
+  });
+});
+
+test.describe(`test describe check put /tasks`, () => {
+  test(`check put method`, async ({ request }) => {
+    const randomNum = Math.floor(Math.random() * 1000);
+    const response = await request.post(URL_TASKS, {
+      data: {
+        title: `task check put Playwright #${randomNum}`,
+      },
+    });
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body.title).toBe(`task check put Playwright #${randomNum}`);
+    const taskId = body.id;
+    const startPut = Date.now();
+    const responsePut = await request.put(`${URL_TASKS}/${taskId}`, {
+      data: {
+        completed: true,
+      },
+    });
+    const durationPut = Date.now() - startPut;
+    expect(durationPut).toBeLessThan(1000);
+    const bodyPut = await responsePut.json();
+    expect(bodyPut.completed).toBe(true);
+    const responseDel = await request.delete(`${URL_TASKS}/${taskId}`);
+    const bodyDel = await responseDel.json();
+    expect(bodyDel.message).toBe("Удалено");
   });
 });
