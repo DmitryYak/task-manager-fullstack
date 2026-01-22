@@ -1,20 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
   <head>
     <title>Task Manager</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+      :root {
+        /* Russ Outdoor style */
+        --brand-blue: #0a2a66;
+        --accent-blue: #005bbb;
+        --light-accent: #1e90ff;
+
+        --bg-light: #f0f4fa;
+        --text-main: #1f2937;
+        --text-light: #ffffff;
+      }
+
       body {
         font-family: Arial, sans-serif;
         max-width: 600px;
         margin: 50px auto;
         padding: 20px;
-        background: #f5f5f5;
+        background-image: url("https://www.russoutdoor.ru/_nuxt/img/top_block.e0b06ef.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        color: var(--text-main);
+        position: relative;
       }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(
+          0,
+          0,
+          0,
+          0.5
+        ); /* Полупрозрачный оверлей для читаемости */
+        z-index: -1;
+      }
+
       h1 {
         text-align: center;
-        color: #333;
+        color: var(--brand-blue);
       }
       input[type="text"] {
         width: 70%;
@@ -25,15 +59,15 @@
       }
       button {
         padding: 12px 20px;
-        background: #007bff;
-        color: white;
+        background: var(--accent-blue);
+        color: var(--text-light);
         border: none;
         border-radius: 4px;
         cursor: pointer;
         font-size: 16px;
       }
       button:hover {
-        background: #0056b3;
+        background: var(--light-accent);
       }
       ul {
         list-style: none;
@@ -43,39 +77,60 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: white;
         margin: 10px 0;
         padding: 15px;
         border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background: #ffffff !important;
+        border-left: 4px solid var(--brand-blue);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(5px); /* Лёгкий блюр для современности */
       }
       .completed {
         text-decoration: line-through;
-        opacity: 0.6;
-        background: #e9ecef;
+        opacity: 0.7;
+        background: rgba(255, 255, 255, 0.974);
+        border-left: 4px solid var(--light-accent);
       }
-      .actions .toggle-btn {
-        background: #28a745;
-        margin-left: 5px;
-        padding: 8px 12px;
-        font-size: 14px;
+      .actions {
+        display: flex;
+        gap: 6px;
       }
 
+      .actions button {
+        padding: 8px 12px;
+        font-size: 14px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      /* toggle */
+      .actions .toggle-btn {
+        background: #28a745;
+        color: #fff;
+      }
       .actions .toggle-btn:hover {
         background: #218838;
       }
 
-      .actions button:not(.toggle-btn) {
+      /* edit — прозрачно-голубая */
+      .actions .edit-btn {
+        background: #28d3c7;
+        color: #007bff;
+      }
+      .actions .edit-btn:hover {
+        background: rgba(0, 123, 255, 0.25);
+      }
+
+      /* delete — красная */
+      .actions .delete-btn {
         background: #dc3545;
+        color: #fff;
       }
-
-      .actions button:not(.toggle-btn):hover {
+      .actions .delete-btn:hover {
         background: #c82333;
       }
 
-      .actions button:hover {
-        background: #c82333;
-      }
       .toggle-btn {
         background: #28a745;
       }
@@ -101,9 +156,86 @@
     <ul id="taskList"></ul>
     <div id="status"></div>
 
+    <footer style="margin-top: 40px; text-align: center; padding: 20px">
+      <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 15px">
+        Made by <strong>Dmitry Yakovlev</strong>
+      </p>
+      <div
+        style="
+          display: flex;
+          gap: 15px;
+          justify-content: center;
+          flex-wrap: wrap;
+        "
+      >
+        <!-- Russ Outdoor -->
+        <a
+          href="https://www.russoutdoor.ru/"
+          target="_blank"
+          id="russLink"
+          style="
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 14px;
+          "
+          onmouseover="
+            this.style.background = 'rgba(255,255,255,0.3)';
+            this.style.transform = 'scale(1.05)';
+          "
+          onmouseout="
+            this.style.background = 'rgba(255,255,255,0.2)';
+            this.style.transform = 'scale(1)';
+          "
+        >
+          🌐 Russ Outdoor
+        </a>
+
+        <!-- Wildberries -->
+        <a
+          href="https://www.wildberries.ru/"
+          target="_blank"
+          id="wbLink"
+          style="
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(
+              45deg,
+              #f90479,
+              #7f30e3
+            ); /* Градиент WB */
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(249, 4, 121, 0.4);
+          "
+          onmouseover="
+            this.style.transform = 'scale(1.05)';
+            this.style.boxShadow = '0 6px 20px rgba(249,4,121,0.6)';
+          "
+          onmouseout="
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = '0 4px 15px rgba(249,4,121,0.4)';
+          "
+        >
+          🛒 Wildberries
+        </a>
+      </div>
+    </footer>
+
     <!-- Axios из node_modules (после npm i axios) -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
-[web:31]
+my Playwright testing

@@ -1,8 +1,14 @@
-const { test, expect } = require("@playwright/test");
-// import { test, expect } from "@playwright/test";
+// const { test, expect } = require("@playwright/test");
+import { test, expect } from "@playwright/test";
 
 const API_URL = process.env.API_URL;
 const URL_TASKS = `${API_URL}/tasks`;
+
+function dateNowString() {
+  const now = new Date();
+  return now.toLocaleString();
+}
+// console.log(dateNowString());
 
 test.describe(`check tasks get`, () => {
   test(`check get tasks 200`, async ({ request }) => {
@@ -121,5 +127,30 @@ test.describe(`test describe check put /tasks`, () => {
     const responseDel = await request.delete(`${URL_TASKS}/${taskId}`);
     const bodyDel = await responseDel.json();
     expect(bodyDel.message).toBe("Удалено");
+  });
+});
+
+test.describe(`test ALL CRUD)`, () => {
+  test(`create → update → delete → validate`, async ({ request }) => {
+    // const taskTitle = `auto-test:${Date.now()}`;
+    let taskId;
+    await test.step(`create task`, async () => {
+      const response = await request.post(URL_TASKS, {
+        data: {
+          title: `auto-test playwright: ${dateNowString()}`,
+        },
+      });
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      taskId = body.id;
+      expect(body.title).toContain(`auto-test playwright:`);
+    });
+    await test.step(`update task`, async () => {
+      const response = await request.put(`${URL_TASKS}/${taskId}`, {
+        data: {
+          title: `put change: ${dateNowString()}`,
+        },
+      });
+    });
   });
 });

@@ -23,15 +23,36 @@ function renderTasks(tasks) {
   tasks.forEach((task) => {
     const li = document.createElement("li");
     li.className = task.completed ? "completed" : "";
+
     li.innerHTML = `
-      <span ondblclick="toggleTask(${task.id})">${task.title}</span>
+      <span>${task.title}</span>
       <div class="actions">
-        <button class="toggle-btn" onclick="toggleTask(${task.id})">${
-      task.completed ? "↶" : "✓"
-    }</button>
-        <button onclick="deleteTask(${task.id})">❌</button>
+        <button
+          class="toggle-btn"
+          onclick="toggleTask(${task.id})"
+          title="Выполнить / вернуть"
+        >
+          ${task.completed ? "↶" : "✓"}
+        </button>
+
+        <button
+          class="edit-btn"
+          onclick="editTask(${task.id}, '${task.title.replace(/'/g, "\\'")}')"
+          title="Редактировать"
+        >
+          ✏️
+        </button>
+
+        <button
+          class="delete-btn"
+          onclick="deleteTask(${task.id})"
+          title="Удалить"
+        >
+          ❌
+        </button>
       </div>
     `;
+
     taskList.appendChild(li);
   });
 }
@@ -69,6 +90,19 @@ async function deleteTask(id) {
     loadTasks();
   } catch (error) {
     alert("Ошибка: " + error.message);
+  }
+}
+async function editTask(id, oldTitle) {
+  const newTitle = prompt("Изменить задачу:", oldTitle);
+  if (!newTitle || newTitle.trim() === oldTitle) return;
+
+  try {
+    await axios.put(`${API_URL}/tasks/${id}`, {
+      title: newTitle.trim(),
+    });
+    loadTasks();
+  } catch (error) {
+    alert("Ошибка обновления: " + error.message);
   }
 }
 
