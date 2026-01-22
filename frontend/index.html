@@ -5,6 +5,184 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+      /* МОДАЛЬНОЕ ОКНО — ИДЕАЛЬНЫЙ ЦЕНТРИРОВАННЫЙ */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .modal-content {
+        width: 100%;
+        max-width: 450px;
+        max-height: 90vh;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        animation: modalSlideIn 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          transform: translateY(-30px) scale(0.95);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        padding: 24px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        color: var(--brand-blue);
+        font-size: 20px;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 20px;
+        color: #666;
+        transition: all 0.2s;
+      }
+
+      .modal-close:hover {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+      }
+
+      .modal-body {
+        padding: 24px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+      }
+
+      #editInput {
+        flex: 1;
+        padding: 14px 16px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.2s;
+      }
+
+      #editInput:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 4px rgba(0, 91, 187, 0.15);
+      }
+
+      .modal-footer {
+        padding: 20px 24px 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .btn-cancel,
+      .btn-save {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+      }
+
+      .btn-cancel {
+        background: #f8f9fa;
+        color: #6c757d;
+      }
+
+      .btn-cancel:hover {
+        background: #e9ecef;
+      }
+
+      .btn-save {
+        background: var(--accent-blue);
+        color: white;
+      }
+
+      .btn-save:hover {
+        background: var(--light-accent);
+      }
+
+      #editInput {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+      }
+      #editInput:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 3px rgba(0, 91, 187, 0.1);
+      }
+
+      .modal-footer {
+        padding: 20px 24px 24px;
+        text-align: right;
+        gap: 12px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .btn-cancel {
+        padding: 10px 20px;
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .btn-save {
+        padding: 10px 20px;
+        background: var(--accent-blue);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .btn-save:hover {
+        background: var(--light-accent);
+      }
+      .btn-cancel:hover {
+        background: #e9ecef;
+      }
+
       :root {
         /* Russ Outdoor style */
         --brand-blue: #0a2a66;
@@ -147,6 +325,23 @@
       }
     </style>
   </head>
+  <!-- Модальное окно редактирования -->
+  <div id="editModal" class="modal" style="display: none">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>✏️ Редактировать задачу</h3>
+        <span class="modal-close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="editInput" placeholder="Новое название задачи" />
+      </div>
+      <div class="modal-footer">
+        <button id="cancelEdit" class="btn-cancel">Отмена</button>
+        <button id="saveEdit" class="btn-save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
   <body>
     <h1>Task Manager</h1>
     <div>

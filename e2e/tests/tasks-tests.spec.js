@@ -151,6 +151,15 @@ test.describe(`test ALL CRUD)`, () => {
           title: `put change: ${dateNowString()}`,
         },
       });
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      expect(body.title).toContain("put change");
+    });
+    await test.step(`delete`, async () => {
+      const response = await request.delete(`${URL_TASKS}/${taskId}`);
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      expect(body.message).toBe("Удалено");
     });
   });
 });

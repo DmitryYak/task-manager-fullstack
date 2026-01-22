@@ -37,7 +37,7 @@ function renderTasks(tasks) {
 
         <button
           class="edit-btn"
-          onclick="editTask(${task.id}, '${task.title.replace(/'/g, "\\'")}')"
+          onclick="showEditModal(${task.id}, '${task.title.replace(/'/g, "\\'")}')"
           title="Редактировать"
         >
           ✏️
@@ -92,18 +92,52 @@ async function deleteTask(id) {
     alert("Ошибка: " + error.message);
   }
 }
-async function editTask(id, oldTitle) {
-  const newTitle = prompt("Изменить задачу:", oldTitle);
-  if (!newTitle || newTitle.trim() === oldTitle) return;
+let currentEditId = null;
+let currentEditTitle = "";
 
-  try {
-    await axios.put(`${API_URL}/tasks/${id}`, {
-      title: newTitle.trim(),
-    });
-    loadTasks();
-  } catch (error) {
-    alert("Ошибка обновления: " + error.message);
-  }
+function showEditModal(id, title) {
+  currentEditId = id;
+  currentEditTitle = title;
+  document.getElementById("editInput").value = title;
+  document.getElementById("editModal").style.display = "flex";
+  document.getElementById("editInput").focus();
 }
+
+function hideEditModal() {
+  document.getElementById("editModal").style.display = "none";
+  currentEditId = null;
+}
+
+// Обработчики модала
+document.addEventListener("DOMContentLoaded", () => {
+  // Закрытие по крестику/отмена
+  document.querySelector(".modal-close").onclick = hideEditModal;
+  document.getElementById("cancelEdit").onclick = hideEditModal;
+
+  // Сохранить
+  document.getElementById("saveEdit").onclick = async () => {
+    const newTitle = document.getElementById("editInput").value.trim();
+    if (!newTitle || newTitle === currentEditTitle) {
+      hideEditModal();
+      return;
+    }
+
+    try {
+      await axios.put(`${API_URL}/tasks/${currentEditId}`, { title: newTitle });
+      loadTasks();
+      hideEditModal();
+    } catch (error) {
+      alert("Ошибка: " + error.message); // Пока оставим для ошибок
+    }
+  };
+
+  // Закрытие по клику вне модала / ESC
+  document.getElementById("editModal").onclick = (e) => {
+    if (e.target.classList.contains("modal")) hideEditModal();
+  };
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && currentEditId) hideEditModal();
+  });
+});
 
 loadTasks(); // Автозагрузка[web:30][web:32][conversation_history:10]

@@ -4,6 +4,7 @@ require("dotenv").config();
 module.exports = defineConfig({
   testDir: "./tests",
   testMatch: ["**/*.spec.js"],
+  reporter: [["html"]],
   use: {
     baseURL: "http://localhost:5500",
     headless: false,
