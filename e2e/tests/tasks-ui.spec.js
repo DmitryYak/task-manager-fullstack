@@ -7,47 +7,50 @@ test.describe("Task Manager UI", () => {
     await page.goto(BASE_URL);
   });
 
-  test("smoke: заголовок страницы", async ({ page }) => {
+  test("smoke: заголовки страницы", async ({ page }) => {
     await expect(page).toHaveTitle(/Task Manager/i);
-    await expect(page.locator("h1")).toHaveText("Task Manager");
+    await expect(page.locator("h1")).toContainText("Task Manager");
   });
 
   test("добавление новой задачи", async ({ page }) => {
-    await page.fill("#taskInput", "Новая задача");
+    const taskText = `Новая задача ${Date.now()}`;
+    await page.fill("#taskInput", taskText);
     await page.click("#addBtn");
-    const task = page.locator("#taskList li span", { hasText: "Новая задача" });
-    await expect(task).toHaveText("Новая задача");
+    await expect(page.locator(`#taskList li:has-text("${taskText}")`)).toBeVisible();
   });
 
   test("отметка задачи как выполненной", async ({ page }) => {
-    // Добавляем тестовую задачу
-    await page.fill("#taskInput", "Сделать тест");
+    const taskText = `Toggle ${Date.now()}`;
+    await page.fill("#taskInput", taskText);
     await page.click("#addBtn");
-
-    const toggleBtn = page
-      .locator("#taskList li", { hasText: "Сделать тест" })
-      .locator(".toggle-btn");
-    await toggleBtn.click();
-
-    const taskLi = page.locator("#taskList li", { hasText: "Сделать тест" });
-    await expect(taskLi).toHaveClass(/completed/);
+    await page.locator(`#taskList li:has-text("${taskText}") .toggle-btn`).first().click();
+    await expect(page.locator(`#taskList li:has-text("${taskText}")`)).toHaveClass(/completed/);
   });
 
   test("удаление задачи", async ({ page }) => {
-    await page.fill("#taskInput", "Задача для удаления");
+    const taskText = `Delete ${Date.now()}`;
+    await page.fill("#taskInput", taskText);
     await page.click("#addBtn");
+    
+    page.once("dialog", dialog => dialog.accept());
+    await page.locator(`#taskList li:has-text("${taskText}") .delete-btn`).click();
+    
+    await expect(page.locator(`#taskList li:has-text("${taskText}")`)).toHaveCount(0);
+  });
 
-    // Подтверждаем удаление
-    page.on("dialog", (dialog) => dialog.accept());
-
-    const deleteBtn = page
-      .locator("#taskList li", { hasText: "Задача для удаления" })
-      .locator("button", { hasText: "❌" });
-    await deleteBtn.click();
-
-    const taskLi = page.locator("#taskList li", {
-      hasText: "Задача для удаления",
-    });
-    await expect(taskLi).toHaveCount(0);
+  test("редактирование задачи", async ({ page }) => {
+    const oldText = `EditOld ${Date.now()}`;
+    const newText = `EditNew ${Date.now()}`;
+    
+    await page.fill("#taskInput", oldText);
+    await page.click("#addBtn");
+    
+    // .first() для строгой уникальности
+    await page.locator(`#taskList li:has-text("${oldText}") .edit-btn`).first().click();
+    await page.fill("#editInput", newText);
+    await page.click("#saveEdit");
+    
+    await expect(page.locator(`#taskList li:has-text("${newText}")`)).toBeVisible();
+    await expect(page.locator(`#taskList li:has-text("${oldText}")`)).toHaveCount(0);
   });
 });

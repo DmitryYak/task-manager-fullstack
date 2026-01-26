@@ -1,88 +1,84 @@
 const { test, expect } = require("@playwright/test");
 
-const URL_TASKS = "/api/tasks"; // Локальный путь
+const BASE_URL = "http://localhost:5500";  // Полный URL из конфига
 
 test.describe("MOCKED API (NO BACKEND NEEDED)", () => {
   test.beforeEach(async ({ page }) => {
-    // 1. МОК через page.route()
-    await page.route(URL_TASKS, async (route) => {
+    // Навигация на главную (активирует baseURL контекст)
+    await page.goto("/");
+
+    // Mock всех API вызовов
+    await page.route("**/api/tasks**", async (route) => {
       const method = route.request().method();
-      console.log(` MOCKED ${method}`);
+      console.log(`🔥 MOCK ${method} /api/tasks`);
 
       if (method === "GET") {
         await route.fulfill({
           status: 200,
-          headers: { "Content-Type": "application/json" },
+          contentType: "application/json",
           body: JSON.stringify([
-            { id: 1, title: "Mock Task 1", completed: false },
-            { id: 2, title: "Mock Task 2", completed: true },
+            { id: 1, title: "Mock 1", completed: false },
+            { id: 2, title: "Mock 2", completed: true },
           ]),
         });
       } else if (method === "POST") {
         await route.fulfill({
           status: 201,
-          body: JSON.stringify({
-            id: 999,
-            title: "Created!",
-            completed: false,
-          }),
+          contentType: "application/json",
+          body: JSON.stringify({ id: 999, title: "Created!" }),
         });
-      } else if (method === "PUT") {
-        await route.fulfill({ status: 200 });
       } else if (method === "DELETE") {
         await route.fulfill({
           status: 200,
+          contentType: "application/json",
           body: JSON.stringify({ message: "Удалено" }),
         });
       }
     });
   });
 
-  // ТВОИ ТЕСТЫ через page.evaluate (имитируем fetch)
-  test("check get tasks 200", async ({ page }) => {
-    const response = await page.evaluate(async (url) => {
+  // 1. GET - проверка статуса и данных
+  test("GET tasks возвращает 200 + 2 задачи", async ({ page }) => {
+    const result = await page.evaluate(async (url) => {
       const res = await fetch(url);
-      return { status: res.status, body: await res.json() };
-    }, URL_TASKS);
+      return { status: res.status, data: await res.json() };
+    }, `${BASE_URL}/api/tasks`);
 
-    expect(response.status).toBe(200);
-    expect(response.body.length).toBe(2);
-    console.log("✅ GET MOCK WORKS!");
+    expect(result.status).toBe(200);
+    expect(result.data).toHaveLength(2);
   });
 
-  test("check response time", async ({ page }) => {
-    const start = Date.now();
-    const response = await page.evaluate(async (url) => {
-      const res = await fetch(url);
-      return res.status;
-    }, URL_TASKS);
-    const duration = Date.now() - start;
-
-    console.log(`⚡ MOCK TIME: ${duration}ms`);
-    expect(duration).toBeLessThan(50); // Мгновенно!
-  });
-
-  test("check post + delete", async ({ page }) => {
+  // 2. POST + DELETE
+  test("POST создаёт + DELETE удаляет", async ({ page }) => {
     // POST
-    const postResponse = await page.evaluate(async (url) => {
+    const postRes = await page.evaluate(async (url) => {
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: "Test Post" }),
+        body: JSON.stringify({ title: "Test" }),
       });
-      return { status: res.status, body: await res.json() };
-    }, URL_TASKS);
+      return { status: res.status, data: await res.json() };
+    }, `${BASE_URL}/api/tasks`);
 
-    expect(postResponse.status).toBe(201);
-    expect(postResponse.body.id).toBe(999);
+    expect(postRes.status).toBe(201);
+    expect(postRes.data.id).toBe(999);
 
     // DELETE
-    const delResponse = await page.evaluate(async (url) => {
+    const delRes = await page.evaluate(async (url) => {
       const res = await fetch(url, { method: "DELETE" });
-      return await res.json();
-    }, `${URL_TASKS}/999`);
+      return res.json();
+    }, `${BASE_URL}/api/tasks/999`);
 
-    expect(delResponse.message).toBe("Удалено");
-    console.log("✅ POST+DELETE MOCK!");
+    expect(delRes.message).toBe("Удалено");
+  });
+
+  // 3. Response time < 50ms
+  test("Mock API мгновенный (<50ms)", async ({ page }) => {
+    const start = Date.now();
+    await page.evaluate(async (url) => fetch(url), `${BASE_URL}/api/tasks`);
+    const duration = Date.now() - start;
+
+    console.log(`⚡ Mock time: ${duration}ms`);
+    expect(duration).toBeLessThan(50);
   });
 });

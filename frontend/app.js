@@ -29,6 +29,7 @@ function renderTasks(tasks) {
       <div class="actions">
         <button
           class="toggle-btn"
+          
           onclick="toggleTask(${task.id})"
           title="Выполнить / вернуть"
         >
@@ -37,6 +38,7 @@ function renderTasks(tasks) {
 
         <button
           class="edit-btn"
+          aria-label="Редактировать задачу"
           onclick="showEditModal(${task.id}, '${task.title.replace(/'/g, "\\'")}')"
           title="Редактировать"
         >

@@ -1,11 +1,12 @@
 import { test, expect } from "@playwright/test";
 
+
 test.describe("Marketplace Links", () => {
   test("тест обеих ссылок: Russ Outdoor + Wildberries", async ({
     page,
     context,
   }) => {
-    await page.goto("http://localhost:YOUR_PORT/");
+    await page.goto("http://localhost:5500/");
 
     // Russ Outdoor
     const russLink = page.locator("#russLink");

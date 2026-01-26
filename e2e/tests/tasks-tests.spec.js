@@ -1,7 +1,7 @@
 // const { test, expect } = require("@playwright/test");
 import { test, expect } from "@playwright/test";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.API_URL || 'http://localhost:3000';
 const URL_TASKS = `${API_URL}/tasks`;
 
 function dateNowString() {
