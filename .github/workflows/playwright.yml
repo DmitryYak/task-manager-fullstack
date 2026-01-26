@@ -31,10 +31,11 @@ jobs:
     - name: Install e2e deps & browsers
       run: cd e2e && npm ci && npx playwright install --with-deps
 
-    - name: Start Postgres (docker)
+    - name: Start Postgres (docker compose v2)
       run: |
         docker-compose up -d postgres  # Только DB из docker-compose.yml
-        sleep 15
+        sleep 20
+        docker compose ps
 
     - name: Start backend API (localhost:3000)
       run: |
