@@ -15,43 +15,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
 
     - uses: actions/setup-node@v5
       with:
         node-version: 20
 
-    - name: Install deps
-      run: |
-        cd backend && npm ci
-        cd ../frontend && npm i -g serve
-        cd ../e2e && npm ci
+    - name: Install backend deps
+      run: cd backend && npm ci
 
-    - uses: docker/setup-compose-action@v1
+    - name: Install frontend deps (serve)
+      run: cd frontend && npm i -g serve  # Если нет локально
 
-    - name: Start DB (db → tasks-db)
+    - name: Install e2e deps & browsers
+      run: cd e2e && npm ci && npx playwright install --with-deps
+
+    - name: Set up Docker Compose v2
+      uses: docker/setup-compose-action@v1
+
+    - name: List docker-compose services
       run: |
-        docker compose up -d db
+           docker compose config --services  # db, tasks-db, backend?
+           docker compose ps                 # Запущенные контейнеры?
+
+
+    - name: Start Postgres DB (db service)
+      run: |
+        docker compose up -d db 
         sleep 25
         docker compose ps db
 
-    - name: Start backend API :3000
+
+    - name: Start backend API (localhost:3000)
       run: |
         cd backend
-        npm run dev &
+        npm run dev &  # nodemon server.js
         sleep 25
-        curl -f http://localhost:3000/tasks
+        curl -f http://localhost:3000/tasks || exit 1
 
-    - name: Start frontend serve :5500
+    - name: Start frontend serve (localhost:5500) — ваш npx serve
       run: |
         cd frontend
-        npx serve -l 5500 -s . &
+        npx serve -l 5500 -s . &  # -s SPA, -l 5500 порт
         sleep 15
-        curl -f http://localhost:5500
+        curl -f http://localhost:5500 || exit 1
 
-    - name: Playwright browsers
-      run: cd e2e && npx playwright install --with-deps
-
-    - name: Run tests
+    - name: Run Playwright tests
       run: cd e2e && npx playwright test
 
     - uses: actions/upload-artifact@v4
