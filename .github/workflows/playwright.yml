@@ -72,15 +72,20 @@ jobs:
         sleep 25
         docker compose ps db
 
-    - name: Setup backend .env (pass123)
+    - name: Setup backend .env (debug)
       run: |
-        cd backend
-        echo "DB_HOST=localhost" >> .env
-        echo "DB_PORT=5432" >> .env
-        echo "DB_NAME=tasks" >> .env
-        echo "DB_USER=user" >> .env
-        echo "DB_PASSWORD=pass123" >> .env  # CI test DB
-        cat .env
+       cd backend
+       rm -f .env  # Очистка
+       echo "DB_HOST=localhost" >> .env
+       echo "DB_PORT=5432" >> .env
+       echo "DB_NAME=tasks" >> .env
+       echo "DB_USER=user" >> .env
+       echo "DB_PASSWORD=pass123" >> .env
+       echo "PORT=3000" >> .env
+       cat .env  # Все 6 vars
+       export $(cat .env | xargs)  # Загрузить в shell
+       env | grep DB_  # Debug vars
+
 
     - name: Start backend API
       run: |
