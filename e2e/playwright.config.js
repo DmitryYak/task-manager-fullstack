@@ -1,4 +1,4 @@
-const { defineConfig } = require("@playwright/test");
+const { defineConfig, devices } = require("@playwright/test");
 require("dotenv").config();
 
 module.exports = defineConfig({
@@ -7,9 +7,16 @@ module.exports = defineConfig({
   reporter: [["html"]],
   use: {
     baseURL: "http://localhost:5500",
-    headless: false,
+    headless: true,  // CI headless
   },
+  projects: [ 
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
 });
+
 
 // const { defineConfig } = require("@playwright/test");
 

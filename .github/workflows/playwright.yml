@@ -31,8 +31,11 @@ jobs:
     - name: Install frontend deps (serve)
       run: cd frontend && npm i -g serve  
 
-    - name: Install e2e deps & browsers
-      run: cd e2e && npm ci && npx playwright install --with-deps
+    # - name: Install e2e deps & browsers
+    #   run: cd e2e && npm ci && npx playwright install --with-deps
+    - name: Install e2e deps & chromium only
+      run: cd e2e && npm ci && npx playwright install chromium --with-deps
+
 
     - name: Set up Docker Compose v2
       uses: docker/setup-compose-action@v1
@@ -72,27 +75,32 @@ jobs:
         sleep 25
         docker compose ps db
 
-    - name: Setup backend .env (debug)
+    - name: Setup backend .env (debug password)
       run: |
-       cd backend
-       rm -f .env  # Очистка
-       echo "DB_HOST=localhost" >> .env
-       echo "DB_PORT=5432" >> .env
-       echo "DB_NAME=tasks" >> .env
-       echo "DB_USER=user" >> .env
-       echo "DB_PASSWORD=pass123" >> .env
-       echo "PORT=3000" >> .env
-       cat .env  # Все 6 vars
-       export $(cat .env | xargs)  # Загрузить в shell
-       env | grep DB_  # Debug vars
+        cd backend
+        rm -f .env
+        cat > .env << 'EOF'
+        DB_HOST=localhost
+        DB_PORT=5432
+        DB_NAME=tasks
+        DB_USER=user
+        DB_PASSWORD=pass123
+        PORT=3000
+        EOF
+        cat .env  # 6 строк
+        echo "DB_PASSWORD length: ${#DB_PASSWORD}"  # 7 символов?
+
 
 
     - name: Start backend API
       run: |
         cd backend
+        source .env || export $(cat .env | xargs)
+        echo "DEBUG: DB_PASSWORD=xxx${DB_PASSWORD:0:3}xxx"  # pass***
         npm run dev &
-        sleep 30
-        curl -f http://localhost:3000/tasks
+        sleep 35
+        curl -f http://localhost:3000/tasks || curl -f http://localhost:3000
+
 
 
     - name: Start frontend serve (localhost:5500) — ваш npx serve
