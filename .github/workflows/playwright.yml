@@ -11,8 +11,11 @@ permissions:
 
 jobs:
   test:
+    env:
+     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v5
       with:
@@ -26,7 +29,7 @@ jobs:
       run: cd backend && npm ci
 
     - name: Install frontend deps (serve)
-      run: cd frontend && npm i -g serve  # Если нет локально
+      run: cd frontend && npm i -g serve
 
     - name: Install e2e deps & browsers
       run: cd e2e && npm ci && npx playwright install --with-deps
@@ -46,6 +49,15 @@ jobs:
         sleep 25
         docker compose ps db
 
+    - name: Setup backend .env
+      run: |
+        cd backend
+        echo "DB_HOST=localhost" >> .env
+        echo "DB_PORT=5432" >> .env
+        echo "DB_NAME=tasks" >> .env
+        echo "DB_USER=user" >> .env
+        echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+        cat .env    
 
     - name: Start backend API (localhost:3000)
       run: |
