@@ -29,7 +29,7 @@ jobs:
       run: cd backend && npm ci
 
     - name: Install frontend deps (serve)
-      run: cd frontend && npm i -g serve
+      run: cd frontend && npm i -g serve  
 
     - name: Install e2e deps & browsers
       run: cd e2e && npm ci && npx playwright install --with-deps
@@ -43,28 +43,52 @@ jobs:
            docker compose ps                 # Запущенные контейнеры?
 
 
+    # - name: Start Postgres DB (db service)
+    #   run: |
+    #     docker compose up -d db 
+    #     sleep 25
+    #     docker compose ps db
+
+    # - name: Setup backend .env
+    #   run: |
+    #     cd backend
+    #     echo "DB_HOST=localhost" >> .env
+    #     echo "DB_PORT=5432" >> .env
+    #     echo "DB_NAME=tasks" >> .env
+    #     echo "DB_USER=user" >> .env
+    #     echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+    #     cat .env    
+
+    # - name: Start backend API (localhost:3000)
+    #   run: |
+    #     cd backend
+    #     npm run dev &  # nodemon server.js
+    #     sleep 25
+    #     curl -f http://localhost:3000/tasks || exit 1
+
     - name: Start Postgres DB (db service)
       run: |
         docker compose up -d db 
         sleep 25
         docker compose ps db
 
-    - name: Setup backend .env
+    - name: Setup backend .env (pass123)
       run: |
         cd backend
         echo "DB_HOST=localhost" >> .env
         echo "DB_PORT=5432" >> .env
         echo "DB_NAME=tasks" >> .env
         echo "DB_USER=user" >> .env
-        echo "DB_PASSWORD=$DB_PASSWORD" >> .env
-        cat .env    
+        echo "DB_PASSWORD=pass123" >> .env  # CI test DB
+        cat .env
 
-    - name: Start backend API (localhost:3000)
+    - name: Start backend API
       run: |
         cd backend
-        npm run dev &  # nodemon server.js
-        sleep 25
-        curl -f http://localhost:3000/tasks || exit 1
+        npm run dev &
+        sleep 30
+        curl -f http://localhost:3000/tasks
+
 
     - name: Start frontend serve (localhost:5500) — ваш npx serve
       run: |
