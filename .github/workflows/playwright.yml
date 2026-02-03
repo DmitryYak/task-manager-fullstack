@@ -88,7 +88,7 @@ jobs:
         PORT=3000
         EOF
         cat .env  # 6 строк
-        echo "DB_PASSWORD length: ${#DB_PASSWORD}"  # 7 символов?
+        echo "DB_PASSWORD length: ${#DB_PASSWORD}"
 
 
 
@@ -103,7 +103,7 @@ jobs:
 
 
 
-    - name: Start frontend serve (localhost:5500) — ваш npx serve
+    - name: Start frontend serve (localhost:5500) — npx serve
       run: |
         cd frontend
         npx serve -l 5500 -s . &  # -s SPA, -l 5500 порт
